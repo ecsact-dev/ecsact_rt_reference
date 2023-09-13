@@ -1,0 +1,9 @@
+# bazel
+bazel-*
+user.bazelrc
+
+# dev stuff
+compile_commands.json
+external
+.cache/
+.vs

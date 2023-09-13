@@ -1,0 +1,20 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@ecsact_runtime//bazel:copts.bzl", "copts")
+
+cc_library(
+    name = "request_id_factory",
+    hdrs = ["request_id_factory.hh"],
+    copts = copts,
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "**/*.hh",
+        "**/*.cc",
+    ]),
+    visibility = [
+        "//async_reference:__pkg__",
+    ],
+)

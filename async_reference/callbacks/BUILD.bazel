@@ -1,0 +1,43 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@ecsact_runtime//bazel:copts.bzl", "copts")
+
+cc_library(
+    name = "execution_callbacks",
+    srcs = ["execution_callbacks.cc"],
+    hdrs = ["execution_callbacks.hh"],
+    copts = copts,
+    local_defines = [
+        "ECSACT_CORE_API=",
+        "ECSACT_SERIALIZE_API=",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:core",
+        "//async_reference/util:types",
+        "//serialize_reference",
+    ],
+)
+
+cc_library(
+    name = "async_callbacks",
+    srcs = ["async_callbacks.cc"],
+    hdrs = ["async_callbacks.hh"],
+    copts = copts,
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:core",
+        "//async_reference/util",
+        "//async_reference/util:types",
+    ],
+)
+
+filegroup(
+    name = "callback_source",
+    srcs = glob([
+        "**/*.hh",
+        "**/*.cc",
+    ]),
+    visibility = [
+        "//async_reference:__pkg__",
+    ],
+)
