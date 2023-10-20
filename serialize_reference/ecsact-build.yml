@@ -1,0 +1,34 @@
+name: Serialize Reference
+
+exports:
+  - ecsact_serialize_action_size
+  - ecsact_serialize_component_size
+  - ecsact_serialize_action
+  - ecsact_deserialize_action
+  - ecsact_serialize_component
+  - ecsact_deserialize_component
+  - ecsact_dump_entities
+  - ecsact_restore_entities
+  - ecsact_restore_as_execution_options
+
+imports:
+  - ecsact_add_component
+  - ecsact_get_component
+  - ecsact_get_components
+  - ecsact_update_component
+  - ecsact_remove_component
+  - ecsact_has_component
+  - ecsact_each_component
+  - ecsact_count_components
+  - ecsact_get_entities
+  - ecsact_create_entity
+  - ecsact_destroy_entity
+  - ecsact_destroy_registry
+  - ecsact_count_entities
+
+sources:
+  - path: serialize_reference.cc
+    outdir: src
+  - codegen:
+    - ../bazel-bin/serialize_reference/codegen/codegen_bin
+    outdir: src
