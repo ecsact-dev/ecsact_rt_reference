@@ -29,6 +29,6 @@ imports:
 sources:
   - path: serialize_reference.cc
     outdir: src
-  - codegen:
-    - ../bazel-bin/serialize_reference/codegen/codegen_bin
-    outdir: src
+  # - codegen:
+    # - ../bazel-bin/serialize_reference/codegen/codegen_bin
+    # outdir: src
