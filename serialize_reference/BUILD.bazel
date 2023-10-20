@@ -1,20 +1,38 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@ecsact_runtime//bazel:copts.bzl", "copts")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "serialize_reference",
-    srcs = ["serialize_reference.cc"],
-    copts = copts,
-    local_defines = ["ECSACT_SERIALIZE_API="],
-    deps = [
-        "//:common",
-        "//:serialize",
+ecsact_build_recipe(
+    name = "serialize_reference_build_recipe",
+    srcs = [
+        "serialize_reference.cc",
+    ],
+    codegen_plugins = {
+        "//serialize_reference/codegen": "src",
+    },
+    exports = [
+        "ecsact_serialize_action_size",
+        "ecsact_serialize_component_size",
+        "ecsact_serialize_action",
+        "ecsact_deserialize_action",
+        "ecsact_serialize_component",
+        "ecsact_deserialize_component",
+        "ecsact_dump_entities",
+        "ecsact_restore_entities",
+        "ecsact_restore_as_execution_options",
+    ],
+    imports = [
+        "ecsact_add_component",
+        "ecsact_get_component",
+        "ecsact_get_components",
+        "ecsact_update_component",
+        "ecsact_remove_component",
+        "ecsact_has_component",
+        "ecsact_each_component",
     ],
 )
 
-filegroup(
-    name = "serialize_source",
-    srcs = glob(["*.cc", "*.hh"]),
+alias(
+    name = "serialize_reference",
+    actual = ":serialize_reference_build_recipe",
 )
