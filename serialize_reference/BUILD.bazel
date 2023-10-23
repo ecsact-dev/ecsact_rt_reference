@@ -29,6 +29,12 @@ ecsact_build_recipe(
         "ecsact_remove_component",
         "ecsact_has_component",
         "ecsact_each_component",
+        "ecsact_count_components",
+        "ecsact_get_entities",
+        "ecsact_create_entity",
+        "ecsact_destroy_entity",
+        "ecsact_destroy_registry",
+        "ecsact_count_entities",
     ],
 )
 
