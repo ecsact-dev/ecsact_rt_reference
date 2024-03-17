@@ -1,6 +1,6 @@
 module(name = "ecsact_rt_reference")
 
-bazel_dep(name = "rules_cc", version = "0.0.8")
+bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "ecsact_runtime")
 bazel_dep(name = "ecsact_codegen")
 
