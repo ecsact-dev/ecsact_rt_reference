@@ -1,0 +1,7 @@
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
+
+ecsact_binary(
+    name = "async",
+    recipes = ["@ecsact_rt_reference//async_reference"],
+    srcs = ["async_test.ecsact"],
+)

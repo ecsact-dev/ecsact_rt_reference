@@ -12,11 +12,10 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:core",
-        "//:serialize",
+        "@ecsact_runtime//:core",
+        "@ecsact_runtime//:serialize",
         "//async_reference/detail/c_execution_options",
         "//async_reference/util:types",
-        "//serialize_reference",
     ],
 )
 
@@ -29,8 +28,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:async",
-        "//:core",
+        "@ecsact_runtime//:async",
+        "@ecsact_runtime//:core",
     ],
 )
 

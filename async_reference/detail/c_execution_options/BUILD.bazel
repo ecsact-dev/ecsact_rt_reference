@@ -11,8 +11,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//:async",
-        "//:core",
+        "@ecsact_runtime//:async",
+        "@ecsact_runtime//:core",
     ],
 )
 

@@ -1,6 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
-load("@rules_ecsact//ecsact:defs.bzl", "ecsact_codegen")
-load("@ecsact_runtime//bazel:copts.bzl", "copts")
 load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
 
 ecsact_binary(
