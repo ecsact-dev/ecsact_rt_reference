@@ -8,7 +8,7 @@ ecsact_build_recipe(
         "serialize_reference.cc",
     ],
     codegen_plugins = {
-        "//serialize_reference/codegen": "src",
+        "//serialize_reference/codegen": ".",
     },
     exports = [
         "ecsact_serialize_action_size",
