@@ -21,6 +21,17 @@ local_path_override(
 )
 
 git_override(
+    module_name = "ecsact_cli",
+    remote = "https://github.com/ecsact-dev/ecsact_cli.git",
+    commit = "c236890845822d5696a636f72c9865fa9245d47e",
+)
+
+# local_path_override(
+#     module_name = "ecsact_cli",
+#     path = "../../ecsact_cli",
+# )
+
+git_override(
     module_name = "hedron_compile_commands",
     commit = "204aa593e002cbd177d30f11f54cff3559110bb9",
     remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
