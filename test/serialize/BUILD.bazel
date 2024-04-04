@@ -1,5 +1,7 @@
 load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
 
+package(default_visibility = ["//:__pkg__"])
+
 ecsact_binary(
     name = "serialize",
     recipes = ["@ecsact_rt_reference//serialize_reference"],
