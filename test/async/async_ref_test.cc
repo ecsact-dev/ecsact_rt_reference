@@ -54,7 +54,7 @@ void async_test::RemoveComponent::impl(context& ctx) {
 }
 
 void async_test::TryEntity::impl(context& ctx) {
-	// santity check
+	// sanity check
 	ctx.action();
 }
 

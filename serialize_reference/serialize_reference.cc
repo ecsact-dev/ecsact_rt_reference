@@ -87,7 +87,7 @@ ecsact_restore_error ecsact_restore_as_execution_options(
 ) {
 	auto placeholder_ids = std::vector<ecsact_placeholder_entity_id>{};
 	auto component_ids_list = std::vector<std::vector<ecsact_component_id>>{};
-	auto component_datas_list =
+	auto entity_component_data_list =
 		std::vector<std::vector<std::vector<std::byte>>>{};
 
 	auto read_amount = int32_t{};
@@ -103,24 +103,24 @@ ecsact_restore_error ecsact_restore_as_execution_options(
 
 	placeholder_ids.reserve(ent_count);
 	component_ids_list.reserve(ent_count);
-	component_datas_list.reserve(ent_count);
+	entity_component_data_list.reserve(ent_count);
 
 	for(int32_t ent_idx = 0; ent_count > ent_idx; ++ent_idx) {
 		placeholder_ids.push_back(static_cast<ecsact_placeholder_entity_id>(ent_idx)
 		);
 
 		auto& component_ids = component_ids_list.emplace_back();
-		auto& component_datas = component_datas_list.emplace_back();
+		auto& component_data_list = entity_component_data_list.emplace_back();
 
 		auto components_count = int32_t{};
 		READ_CALLBACK_INTO_VAR(components_count);
 
 		component_ids.reserve(components_count);
-		component_datas.reserve(components_count);
+		component_data_list.reserve(components_count);
 
 		for(int i = 0; components_count > i; ++i) {
 			auto& component_id = component_ids.emplace_back();
-			auto& component_data = component_datas.emplace_back();
+			auto& component_data = component_data_list.emplace_back();
 			auto  component_size = int32_t{};
 			READ_CALLBACK_INTO_VAR(component_id);
 			READ_CALLBACK_INTO_VAR(component_size);
@@ -161,8 +161,8 @@ ecsact_restore_error ecsact_restore_as_execution_options(
 	}
 
 	auto entity_components_owner = std::vector<std::vector<ecsact_component>>{};
-	for(auto i = 0; component_datas_list.size() > i; ++i) {
-		auto& comp_data = component_datas_list[i];
+	for(auto i = 0; entity_component_data_list.size() > i; ++i) {
+		auto& comp_data = entity_component_data_list[i];
 		auto& comp_ids = component_ids_list[i];
 
 		auto& comp_data_list = entity_components_owner.emplace_back();
@@ -217,23 +217,23 @@ void ecsact_dump_entities(
 		callback(&components_count, sizeof(components_count), callback_user_data);
 
 		auto component_ids = std::vector<ecsact_component_id>{};
-		auto component_datas = std::vector<const void*>{};
+		auto component_data_list = std::vector<const void*>{};
 
 		component_ids.resize(components_count);
-		component_datas.resize(components_count);
+		component_data_list.resize(components_count);
 
 		ecsact_get_components(
 			registry_id,
 			entity,
 			components_count,
 			component_ids.data(),
-			component_datas.data(),
+			component_data_list.data(),
 			nullptr
 		);
 
 		for(int i = 0; components_count > i; ++i) {
 			const auto component_id = component_ids[i];
-			const auto component_data = component_datas[i];
+			const auto component_data = component_data_list[i];
 			const auto component_size = ecsact_serialize_component_size(component_id);
 
 			auto serialized_component_data =
