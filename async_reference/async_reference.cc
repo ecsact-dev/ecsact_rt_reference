@@ -5,6 +5,7 @@
 #include <iterator>
 #include <chrono>
 
+#include "ecsact/runtime/core.h"
 #include "async_reference.hh"
 
 using namespace ecsact::async_reference::detail;
@@ -18,8 +19,8 @@ static auto str_subrange(std::string_view str, auto start, auto end) {
 	return str.substr(start, end - start);
 }
 
-static auto parse_connection_string(std::string_view str)
-	-> parsed_connection_string {
+static auto parse_connection_string(std::string_view str
+) -> parsed_connection_string {
 	auto result = parsed_connection_string{};
 
 	auto options_start = str.find("?");

@@ -1,4 +1,4 @@
-package serialize_test;
+main package serialize_test;
 
 component ExampleTagComponent {}
 

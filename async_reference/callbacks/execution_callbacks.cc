@@ -122,10 +122,10 @@ void execution_callbacks::invoke(
 	if(execution_events->remove_callback != nullptr) {
 		for(auto& component_info : remove_callbacks) {
 			for(auto& execute_component : remove_execution_components) {
-				if(execute_component.entity_id != component_info.entity_id && execute_component._id != component_info.component_id) {
+				if(execute_component.entity_id != component_info.entity_id &&
+					 execute_component._id != component_info.component_id) {
 					continue;
 				}
-
 				auto deserialized_component =
 					ecsact::deserialize(execute_component._id, execute_component.data);
 
@@ -258,7 +258,8 @@ void execution_callbacks::remove_callback(
 
 	auto component_to_serialize = ecsact_component{
 		.component_id = component_id,
-		.component_data = component_data};
+		.component_data = component_data
+	};
 
 	auto serialized_component = ecsact::serialize(component_to_serialize);
 

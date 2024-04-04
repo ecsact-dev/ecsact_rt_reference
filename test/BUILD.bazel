@@ -1,21 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
-load("@ecsact_runtime//bazel:copts.bzl", "copts")
-load("@ecsact_codegen//:codegen_plugin.bzl", "cc_ecsact_codegen_plugin")
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
 
-cc_ecsact_codegen_plugin(
-    name = "empty_codegen_plugin",
-    srcs = ["empty_codegen_plugin.cc"],
-    copts = copts,
-    output_extension = "txt",
-)
-
-cc_test(
-    name = "test",
-    srcs = ["test.cc"],
-    copts = copts,
-    deps = [
-        "@ecsact_runtime",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
+build_test(
+    name = "build",
+    targets = [
+        "//async",
+        "//serialize",
     ],
 )
