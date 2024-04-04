@@ -42,7 +42,7 @@ private:
 	std::vector<ecsact_component> adds;
 	std::vector<ecsact_component> updates;
 
-	std::vector<ecsact_component*>             create_entity_components_datas;
+	std::vector<ecsact_component*>             create_entity_components_data;
 	std::vector<std::vector<ecsact_component>> create_entity_components;
 	std::vector<int32_t>                       create_entity_components_length;
 };

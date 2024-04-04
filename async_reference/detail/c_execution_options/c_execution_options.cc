@@ -47,7 +47,7 @@ ecsact_execution_options c_execution_options::c() {
 			entity_components.push_back(component);
 		}
 
-		create_entity_components_datas.push_back(entity_components.data());
+		create_entity_components_data.push_back(entity_components.data());
 	}
 
 	options.actions = actions.data();
@@ -67,7 +67,7 @@ ecsact_execution_options c_execution_options::c() {
 	options.remove_components_length = remove_ids.size();
 
 	options.create_entities = create_entity_placeholder_ids.data();
-	options.create_entities_components = create_entity_components_datas.data();
+	options.create_entities_components = create_entity_components_data.data();
 	options.create_entities_length = create_entities_components.size();
 	options.create_entities_components_length =
 		create_entity_components_length.data();

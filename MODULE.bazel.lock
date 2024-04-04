@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "b9a920dd39f2a4a369d1ef8d3777d6dd7c90da34f3ed6ef8935a819eee0e75fc",
+  "moduleFileHash": "e6f2e764385805292e0b26fdd67ed9b54dfa5c027804a0561838066873747886",
   "flags": {
     "cmdRegistries": [
       "https://raw.githubusercontent.com/ecsact-dev/bazel_registry/main",
