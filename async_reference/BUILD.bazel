@@ -1,6 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@ecsact_runtime//bazel:copts.bzl", "copts")
-load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe", "ecsact_build_recipe_bundle")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,29 +7,29 @@ ecsact_build_recipe(
     srcs = [
         ":sources",
     ],
+    imports = [
+        "ecsact_create_registry",
+        "ecsact_deserialize_action",
+        "ecsact_deserialize_component",
+        "ecsact_execute_systems",
+        "ecsact_get_component",
+        "ecsact_serialize_action",
+        "ecsact_serialize_action_size",
+        "ecsact_serialize_component",
+        "ecsact_serialize_component_size",
+    ],
     exports = [
         "ecsact_async_connect",
         "ecsact_async_disconnect",
-        "ecsact_async_flush_events",
         "ecsact_async_enqueue_execution_options",
+        "ecsact_async_flush_events",
         "ecsact_async_get_current_tick",
     ],
-    imports = [
-        "ecsact_execute_systems",
-        "ecsact_get_component",
-        "ecsact_serialize_action_size",
-        "ecsact_serialize_component_size",
-        "ecsact_serialize_action",
-        "ecsact_deserialize_action",
-        "ecsact_serialize_component",
-        "ecsact_deserialize_component",
-        "ecsact_create_registry",
-    ]
 )
 
 alias(
     name = "async_reference",
-    actual = ":async_reference_build_recipe",
+    actual = ":async_reference_bundle",
 )
 
 filegroup(
@@ -42,9 +40,14 @@ filegroup(
     ]) + [
         "//async_reference/callbacks:callback_source",
         "//async_reference/detail/c_execution_options:c_execution_source",
+        "//async_reference/request_id_factory:sources",
         "//async_reference/tick_manager:tick_source",
         "//async_reference/util:util_source",
-        "//async_reference/request_id_factory:sources",
     ],
     visibility = ["//visibility:public"],
+)
+
+ecsact_build_recipe_bundle(
+    name = "async_reference_bundle",
+    recipes = [":async_reference_build_recipe"],
 )
