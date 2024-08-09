@@ -1,6 +1,7 @@
 # bazel
 bazel-*
 user.bazelrc
+MODULE.bazel.lock
 
 # dev stuff
 compile_commands.json

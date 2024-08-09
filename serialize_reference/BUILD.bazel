@@ -1,4 +1,4 @@
-load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe", "ecsact_build_recipe_bundle")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,37 +8,43 @@ ecsact_build_recipe(
         "serialize_reference.cc",
     ],
     codegen_plugins = {
-        "//serialize_reference/codegen": ".",
+        "//serialize_reference/codegen": "src",
+        "@ecsact_lang_cpp//cpp_header_codegen": "src",
     },
-    exports = [
-        "ecsact_serialize_action_size",
-        "ecsact_serialize_component_size",
-        "ecsact_serialize_action",
-        "ecsact_deserialize_action",
-        "ecsact_serialize_component",
-        "ecsact_deserialize_component",
-        "ecsact_dump_entities",
-        "ecsact_restore_entities",
-        "ecsact_restore_as_execution_options",
-    ],
     imports = [
         "ecsact_add_component",
-        "ecsact_get_component",
-        "ecsact_get_components",
-        "ecsact_update_component",
-        "ecsact_remove_component",
-        "ecsact_has_component",
-        "ecsact_each_component",
         "ecsact_count_components",
-        "ecsact_get_entities",
+        "ecsact_count_entities",
         "ecsact_create_entity",
         "ecsact_destroy_entity",
         "ecsact_destroy_registry",
-        "ecsact_count_entities",
+        "ecsact_each_component",
+        "ecsact_get_component",
+        "ecsact_get_components",
+        "ecsact_get_entities",
+        "ecsact_has_component",
+        "ecsact_remove_component",
+        "ecsact_update_component",
+    ],
+    exports = [
+        "ecsact_deserialize_action",
+        "ecsact_deserialize_component",
+        "ecsact_dump_entities",
+        "ecsact_restore_as_execution_options",
+        "ecsact_restore_entities",
+        "ecsact_serialize_action",
+        "ecsact_serialize_action_size",
+        "ecsact_serialize_component",
+        "ecsact_serialize_component_size",
     ],
 )
 
 alias(
     name = "serialize_reference",
-    actual = ":serialize_reference_build_recipe",
+    actual = ":serialize_reference_bundle",
+)
+
+ecsact_build_recipe_bundle(
+    name = "serialize_reference_bundle",
+    recipes = [":serialize_reference_build_recipe"],
 )

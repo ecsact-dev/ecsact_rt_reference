@@ -1,4 +1,6 @@
-#include "execution_callbacks.hh"
+#include "async_reference/callbacks/execution_callbacks.hh"
+
+#include "ecsact/runtime/serialize.hh"
 
 using namespace ecsact::async_reference::detail;
 

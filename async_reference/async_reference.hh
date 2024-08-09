@@ -1,24 +1,13 @@
 #pragma once
 
-#include <map>
-#include <vector>
-#include <string>
 #include <mutex>
 #include <thread>
 #include <atomic>
 #include <optional>
-#include <variant>
-#include <condition_variable>
-#include "ecsact/runtime/core.hh"
-#include "ecsact/runtime/async.h"
 
-#include "detail/c_execution_options/c_execution_options.hh"
-#include "util/types.hh"
-#include "util/util.hh"
 #include "tick_manager/tick_manager.hh"
 #include "callbacks/execution_callbacks.hh"
 #include "callbacks/async_callbacks.hh"
-#include "request_id_factory/request_id_factory.hh"
 
 namespace ecsact::async_reference::detail {
 class async_reference {

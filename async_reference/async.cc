@@ -1,9 +1,9 @@
 #include <optional>
 
 #include "ecsact/runtime/async.h"
-#include "async_reference.hh"
-#include "callbacks/async_callbacks.hh"
-#include "request_id_factory/request_id_factory.hh"
+#include "async_reference/async_reference.hh"
+#include "async_reference/callbacks/async_callbacks.hh"
+#include "async_reference/request_id_factory/request_id_factory.hh"
 
 using namespace ecsact::async_reference;
 

@@ -5,7 +5,6 @@
 #include <variant>
 #include <cstddef>
 
-#include "ecsact/runtime/core.h"
 #include "ecsact/runtime/async.h"
 
 namespace ecsact::async_reference::detail::types {

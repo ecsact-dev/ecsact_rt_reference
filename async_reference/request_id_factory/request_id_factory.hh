@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <atomic>
-#include "ecsact/runtime/async.h"
+#include "ecsact/runtime/common.h"
 
 namespace ecsact::async_reference::detail {
 

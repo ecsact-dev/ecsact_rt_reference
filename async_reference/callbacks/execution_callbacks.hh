@@ -2,10 +2,7 @@
 
 #include <vector>
 #include <mutex>
-#include <map>
 
-#include "ecsact/runtime/core.hh"
-#include "ecsact/runtime/serialize.hh"
 #include "../util/types.hh"
 
 namespace ecsact::async_reference::detail {

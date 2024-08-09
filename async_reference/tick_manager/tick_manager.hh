@@ -1,12 +1,10 @@
 #pragma once
 
 #include <cstdint>
-#include <map>
 #include <mutex>
 #include <optional>
 
 #include "../util/types.hh"
-#include "../util/util.hh"
 
 namespace ecsact::async_reference::detail {
 
