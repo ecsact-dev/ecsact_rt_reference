@@ -1,10 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <optional>
 
-#include "ecsact/runtime/core.h"
-#include "ecsact/runtime/async.h"
+#include "ecsact/runtime/common.h"
 
 namespace ecsact::async_reference::detail {
 

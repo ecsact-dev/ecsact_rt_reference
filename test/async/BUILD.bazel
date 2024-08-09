@@ -4,6 +4,7 @@ package(default_visibility = ["//:__pkg__"])
 
 ecsact_binary(
     name = "async",
+    allow_unresolved_imports = True,
     recipes = ["@ecsact_rt_reference//async_reference"],
     srcs = ["async_test.ecsact"],
 )

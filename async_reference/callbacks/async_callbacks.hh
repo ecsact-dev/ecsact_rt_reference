@@ -1,11 +1,8 @@
 #pragma once
 
-#include <variant>
-#include <map>
 #include <mutex>
 
 #include "../util/types.hh"
-#include "../util/util.hh"
 
 namespace ecsact::async_reference::detail {
 
