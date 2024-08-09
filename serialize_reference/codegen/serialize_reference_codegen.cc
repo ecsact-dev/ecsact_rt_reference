@@ -28,12 +28,13 @@ namespace {
 )";
 
 void ecsact_codegen_plugin(
-	ecsact_package_id         pkg_id,
-	ecsact_codegen_write_fn_t write
+	ecsact_package_id          pkg_id,
+	ecsact_codegen_write_fn_t  write,
+	ecsact_codegen_report_fn_t report
 ) {
 	using ecsact::cc_lang_support::cpp_identifier;
 
-	ecsact::codegen_plugin_context ctx{pkg_id, write};
+	ecsact::codegen_plugin_context ctx{pkg_id, write, report};
 
 	fs::path package_hh_path = ecsact::meta::package_file_path(pkg_id);
 	package_hh_path.replace_extension(

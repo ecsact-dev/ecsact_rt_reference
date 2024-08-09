@@ -1,12 +1,9 @@
-#include <span>
-#include <memory>
-#include <ranges>
-#include <algorithm>
-#include <iterator>
 #include <chrono>
+#include <map>
 
 #include "ecsact/runtime/core.h"
-#include "async_reference.hh"
+#include "async_reference/async_reference.hh"
+#include "async_reference/util/util.hh"
 
 using namespace ecsact::async_reference::detail;
 

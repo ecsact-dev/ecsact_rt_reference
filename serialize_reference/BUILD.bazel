@@ -8,7 +8,8 @@ ecsact_build_recipe(
         "serialize_reference.cc",
     ],
     codegen_plugins = {
-        "//serialize_reference/codegen": ".",
+        "//serialize_reference/codegen": "src",
+        "@ecsact_lang_cpp//cpp_header_codegen": "src",
     },
     imports = [
         "ecsact_add_component",
