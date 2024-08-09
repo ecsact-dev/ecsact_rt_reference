@@ -34,7 +34,7 @@ void ecsact_codegen_plugin(
 ) {
 	using ecsact::cc_lang_support::cpp_identifier;
 
-	ecsact::codegen_plugin_context ctx{pkg_id, write, report};
+	ecsact::codegen_plugin_context ctx{pkg_id, 0, write, report};
 
 	fs::path package_hh_path = ecsact::meta::package_file_path(pkg_id);
 	package_hh_path.replace_extension(
