@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.1.1 - 2024-08-10
+#### Features
+- renamed bundles for ecsact CLI SDK discovery - (b37d065) - Ezekiel Warren
+
+- - -
+
 ## 0.1.0 - 2024-08-10
 #### Features
 - Add recipe bundles and update deps (#20) - (a2fc34b) - Austin Kelway
