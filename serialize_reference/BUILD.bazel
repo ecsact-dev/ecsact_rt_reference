@@ -41,10 +41,10 @@ ecsact_build_recipe(
 
 alias(
     name = "serialize_reference",
-    actual = ":serialize_reference_bundle",
+    actual = ":ecsact_serialize_reference",
 )
 
 ecsact_build_recipe_bundle(
-    name = "serialize_reference_bundle",
+    name = "ecsact_serialize_reference",
     recipes = [":serialize_reference_build_recipe"],
 )

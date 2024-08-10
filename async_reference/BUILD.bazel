@@ -29,7 +29,7 @@ ecsact_build_recipe(
 
 alias(
     name = "async_reference",
-    actual = ":async_reference_bundle",
+    actual = ":ecsact_async_reference",
 )
 
 filegroup(
@@ -48,6 +48,6 @@ filegroup(
 )
 
 ecsact_build_recipe_bundle(
-    name = "async_reference_bundle",
+    name = "ecsact_async_reference",
     recipes = [":async_reference_build_recipe"],
 )
