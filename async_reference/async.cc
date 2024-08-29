@@ -13,6 +13,7 @@ using namespace ecsact::async_reference;
 static auto async_callbacks = detail::async_callbacks{};
 static auto request_id_factory = detail::request_id_factory{};
 static auto reference = std::optional<detail::async_reference>{};
+static auto last_status = ECSACT_ASYNC_STATUS_NONE;
 
 ecsact_async_request_id ecsact_async_connect(const char* connection_string) {
 	auto req_id = request_id_factory.next_id();
@@ -32,6 +33,17 @@ void ecsact_async_flush_events(
 	const ecsact_execution_events_collector* execution_evc,
 	const ecsact_async_events_collector*     async_evc
 ) {
+	auto current_status = ecsact_async_get_status();
+	if(current_status != last_status) {
+		last_status = current_status;
+		if(async_evc && async_evc->async_status_change_callback) {
+			async_evc->async_status_change_callback(
+				current_status,
+				async_evc->async_status_change_callback_user_data
+			);
+		}
+	}
+
 	async_callbacks.invoke(async_evc);
 	if(reference) {
 		reference->invoke_execution_events(execution_evc);
