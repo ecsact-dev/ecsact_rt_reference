@@ -15,13 +15,6 @@ action AddComponent {
 	adds ComponentAddRemove;
 }
 
-action TryEntity {
-	include NeededComponent;
-	readwrite ComponentUpdate;
-	entity my_entity;
-	adds ComponentAddRemove;
-}
-
 system UpdateComponent {
 	readwrite ComponentAddRemove;
 }

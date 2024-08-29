@@ -36,6 +36,8 @@ public:
 
 	void disconnect();
 
+	bool is_connected() const;
+
 private:
 	std::atomic_int32_t _last_request_id = 0;
 
@@ -48,7 +50,7 @@ private:
 	std::thread execution_thread;
 	std::mutex  execution_m;
 
-	std::atomic_bool is_connected = false;
+	std::atomic_bool is_connected_ = false;
 
 	std::chrono::milliseconds delta_time = {};
 };

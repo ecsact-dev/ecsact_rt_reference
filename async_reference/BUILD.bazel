@@ -23,6 +23,7 @@ ecsact_build_recipe(
         "ecsact_async_disconnect",
         "ecsact_async_enqueue_execution_options",
         "ecsact_async_flush_events",
+        "ecsact_async_get_status",
         "ecsact_async_get_current_tick",
     ],
 )

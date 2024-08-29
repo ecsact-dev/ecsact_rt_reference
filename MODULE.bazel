@@ -22,6 +22,12 @@ git_override(
     remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
 )
 
+git_override(
+    module_name = "ecsact_runtime",
+    commit = "9dcfb4bc18baf4cbaddc7124f02830a424945a64",
+    remote = "https://github.com/ecsact-dev/ecsact_runtime.git",
+)
+
 ecsact = use_extension("@rules_ecsact//ecsact:extensions.bzl", "ecsact", dev_dependency = True)
 ecsact.toolchain(use_ecsact_cli = True)
 use_repo(ecsact, "ecsact_toolchain")

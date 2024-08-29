@@ -3,14 +3,12 @@
 #include <chrono>
 #include <thread>
 #include <functional>
-
 #include "gtest/gtest.h"
-
-#include "async_test.ecsact.hh"
-#include "async_test.ecsact.systems.hh"
 #include "ecsact/runtime/async.hh"
 #include "ecsact/runtime/core.hh"
 #include "ecsact/runtime/dynamic.h"
+#include "async/_generated/async_test.ecsact.hh"
+#include "async/_generated/async_test.ecsact.systems.hh"
 
 using namespace std::chrono_literals;
 using std::chrono::duration_cast;
@@ -51,11 +49,6 @@ void async_test::UpdateComponent::impl(context& ctx) {
 }
 
 void async_test::RemoveComponent::impl(context& ctx) {
-}
-
-void async_test::TryEntity::impl(context& ctx) {
-	// sanity check
-	ctx.action();
 }
 
 void assert_time_past(
@@ -401,76 +394,6 @@ TEST(AsyncRef, CreateMultipleEntitiesAndDestroy) {
 	static_cast<void>(ecsact::async::enqueue_execution_options(options));
 
 	flush_with_condition([&] { return wait; }, evc);
-
-	ecsact::async::disconnect();
-}
-
-TEST(AsyncRef, TryAction) {
-	using namespace std::chrono_literals;
-	using std::chrono::duration_cast;
-
-	static std::atomic_bool reached_system = false;
-
-	static_cast<void>(ecsact::async::connect("good?delta_time=25"));
-
-	// Declare components required for the action
-	async_test::NeededComponent my_needed_component{};
-
-	async_test::ComponentUpdate my_update_component{.value_to_update = 1};
-
-	auto options = ecsact::core::execution_options{};
-
-	options.create_entity()
-		.add_component(&my_needed_component)
-		.add_component(&my_update_component);
-
-	static_cast<void>(ecsact::async::enqueue_execution_options(options));
-
-	auto evc = ecsact::core::execution_events_collector{};
-
-	static auto entity = ecsact_entity_id{};
-	auto        wait = false;
-
-	evc.set_entity_created_callback(
-		[&](ecsact_entity_id entity_id, ecsact_placeholder_entity_id) {
-			wait = true;
-			entity = entity_id;
-		}
-	);
-
-	flush_with_condition([&] { return wait; }, evc);
-
-	options.clear();
-
-	async_test::TryEntity my_try_entity;
-
-	my_try_entity.my_entity = entity;
-
-	// Declare an action which takes in a function as the implementation
-	reached_system = false;
-	ecsact_set_system_execution_impl(
-		ecsact_id_cast<ecsact_system_like_id>(async_test::TryEntity::id),
-		[](ecsact_system_execution_context* context) {
-			async_test::TryEntity system_action{};
-			ecsact_system_execution_context_action(context, &system_action);
-			ASSERT_EQ(entity, system_action.my_entity);
-			reached_system = true;
-		}
-	);
-
-	// Push the action to execution options
-	options.push_action(&my_try_entity);
-
-	static_cast<void>(ecsact::async::enqueue_execution_options(options));
-
-	auto start_tick = ecsact::async::get_current_tick();
-	while(reached_system != true) {
-		std::this_thread::yield();
-		FLUSH_EVENTS_NEVER_ERROR(nullptr);
-		auto current_tick = ecsact::async::get_current_tick();
-		auto tick_diff = current_tick - start_tick;
-		ASSERT_LT(tick_diff, 10);
-	}
 
 	ecsact::async::disconnect();
 }

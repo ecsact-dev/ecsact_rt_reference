@@ -38,6 +38,18 @@ void ecsact_async_flush_events(
 	}
 }
 
+ecsact_async_status ecsact_async_get_status() {
+	if(!reference) {
+		return ECSACT_ASYNC_STATUS_NONE;
+	}
+
+	if(reference->is_connected()) {
+		return ECSACT_ASYNC_STATUS_CONNECTED;
+	} else {
+		return ECSACT_ASYNC_STATUS_PENDING;
+	}
+}
+
 ecsact_async_request_id ecsact_async_enqueue_execution_options(
 	const ecsact_execution_options options
 ) {
