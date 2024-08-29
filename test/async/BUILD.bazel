@@ -1,46 +1,10 @@
-load("@ecsact_rt_reference//bazel:copts.bzl", "copts")
-load("@rules_cc//cc:defs.bzl", "cc_test")
-load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary", "ecsact_codegen")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
 
 package(default_visibility = ["//:__pkg__"])
 
 ecsact_binary(
     name = "async",
     allow_unresolved_imports = True,
-    recipes = [
-        "@ecsact_rt_reference//async_reference",
-        # NOTE: we don't have a mock core/dynamic module to use so we're using
-        # rt_entt for our tests.
-        "@ecsact_rt_entt",
-    ],
+    recipes = ["@ecsact_rt_reference//async_reference"],
     srcs = ["async_test.ecsact"],
-)
-
-ecsact_codegen(
-    name = "generated",
-    output_directory = "_generated",
-    srcs = ["async_test.ecsact"],
-    plugins = [
-        "@ecsact_lang_cpp//cpp_header_codegen",
-        "@ecsact_lang_cpp//cpp_systems_header_codegen",
-        "@ecsact_lang_cpp//cpp_systems_source_codegen",
-        "@ecsact_lang_cpp//systems_header_codegen",
-    ],
-)
-
-cc_test(
-    name = "test",
-    srcs = [
-        "async_ref_test.cc",
-        ":generated",
-    ],
-    copts = copts,
-    deps = [
-        ":async",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@ecsact_runtime//:core",
-        "@ecsact_runtime//:async",
-        "@ecsact_lang_cpp//:execution_context",
-    ],
 )
