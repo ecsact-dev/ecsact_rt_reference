@@ -1,5 +1,5 @@
 #include <optional>
-
+#include <span>
 #include "ecsact/runtime/async.h"
 #include "async_reference/async_reference.hh"
 #include "async_reference/callbacks/async_callbacks.hh"
@@ -59,4 +59,28 @@ int32_t ecsact_async_get_current_tick() {
 		return reference->get_current_tick();
 	}
 	return 0;
+}
+
+ecsact_async_request_id ecsact_async_stream(
+	int32_t                    count,
+	const ecsact_entity_id*    entities_raw,
+	const ecsact_component_id* component_ids_raw,
+	const void**               components_data_raw
+) {
+	auto req_id = request_id_factory.next_id();
+	if(!reference) {
+		async_callbacks.add(detail::types::async_error{
+			.error = ECSACT_ASYNC_ERR_NOT_CONNECTED,
+			.request_ids = {req_id},
+		});
+		return req_id;
+	}
+
+	auto entities = std::span{entities_raw, static_cast<size_t>(count)};
+	auto component_ids = std::span{component_ids_raw, static_cast<size_t>(count)};
+	auto components_data =
+		std::span{components_data_raw, static_cast<size_t>(count)};
+
+	reference->async_stream(req_id, entities, component_ids, components_data);
+	return req_id;
 }

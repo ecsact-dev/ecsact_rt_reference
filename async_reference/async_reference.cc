@@ -4,6 +4,7 @@
 #include "ecsact/runtime/core.h"
 #include "async_reference/async_reference.hh"
 #include "async_reference/util/util.hh"
+#include "util/types.hh"
 
 using namespace ecsact::async_reference::detail;
 
@@ -197,6 +198,27 @@ void async_reference::execute_systems() {
 			}
 		}
 	});
+}
+
+void async_reference::stream(
+	ecsact_async_request_id              req_id,
+	std::span<const ecsact_entity_id>    entities,
+	std::span<const ecsact_component_id> component_ids,
+	std::span<const void*>               components_data
+) {
+	if(registry_id) {
+		auto stream_error = ecsact_stream(
+			registry_id.value(),
+			static_cast<int32_t>(entities.size()),
+			entities.data(),
+			component_ids.data(),
+			components_data.data()
+		);
+
+		async_callbacks.add(types::async_request_complete{{req_id}});
+	} else {
+		async_callbacks.add(types::async_request_complete{{req_id}});
+	}
 }
 
 void async_reference::invoke_execution_events(

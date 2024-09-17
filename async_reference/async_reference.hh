@@ -4,7 +4,7 @@
 #include <thread>
 #include <atomic>
 #include <optional>
-
+#include <span>
 #include "tick_manager/tick_manager.hh"
 #include "callbacks/execution_callbacks.hh"
 #include "callbacks/async_callbacks.hh"
@@ -22,6 +22,13 @@ public:
 	void enqueue_execution_options(
 		ecsact_async_request_id         req_id,
 		const ecsact_execution_options& options
+	);
+
+	void stream(
+		ecsact_async_request_id              req_id,
+		std::span<const ecsact_entity_id>    entities,
+		std::span<const ecsact_component_id> component_ids,
+		std::span<const void*>               components_data
 	);
 
 	void execute_systems();
