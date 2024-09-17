@@ -25,10 +25,11 @@ public:
 	);
 
 	void stream(
-		ecsact_async_request_id              req_id,
-		std::span<const ecsact_entity_id>    entities,
-		std::span<const ecsact_component_id> component_ids,
-		std::span<const void*>               components_data
+		ecsact_async_request_id req_id,
+		ecsact_entity_id        entity,
+		ecsact_component_id     component_id,
+		const void*             component_data,
+		...
 	);
 
 	void execute_systems();

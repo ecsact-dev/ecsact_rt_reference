@@ -201,19 +201,15 @@ void async_reference::execute_systems() {
 }
 
 void async_reference::stream(
-	ecsact_async_request_id              req_id,
-	std::span<const ecsact_entity_id>    entities,
-	std::span<const ecsact_component_id> component_ids,
-	std::span<const void*>               components_data
+	ecsact_async_request_id req_id,
+	ecsact_entity_id        entity,
+	ecsact_component_id     component_id,
+	const void*             component_data,
+	...
 ) {
 	if(registry_id) {
-		auto stream_error = ecsact_stream(
-			registry_id.value(),
-			static_cast<int32_t>(entities.size()),
-			entities.data(),
-			component_ids.data(),
-			components_data.data()
-		);
+		auto stream_error =
+			ecsact_stream(registry_id.value(), entity, component_id, component_data);
 
 		async_callbacks.add(types::async_request_complete{{req_id}});
 	} else {
