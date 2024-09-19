@@ -1,10 +1,9 @@
 #include <chrono>
 #include <map>
-
 #include "ecsact/runtime/core.h"
 #include "async_reference/async_reference.hh"
 #include "async_reference/util/util.hh"
-#include "util/types.hh"
+#include "async_reference/util/types.hh"
 
 using namespace ecsact::async_reference::detail;
 
