@@ -54,6 +54,10 @@ static auto parse_connection_string(std::string_view str
 	return result;
 }
 
+bool async_reference::is_connected() const {
+	return is_connected_;
+}
+
 void async_reference::connect(
 	ecsact_async_request_id req_id,
 	const char*             connection_string
@@ -74,7 +78,7 @@ void async_reference::connect(
 
 	// The good and bad strings simulate the outcome of connections
 	if(result.host != "good") {
-		is_connected = false;
+		is_connected_ = false;
 
 		async_callbacks.add(types::async_error{
 			.error = ECSACT_ASYNC_ERR_PERMISSION_DENIED,
@@ -100,7 +104,7 @@ void async_reference::connect(
 	}
 
 	registry_id = ecsact_create_registry("async_reference_impl_reg");
-	is_connected = true;
+	is_connected_ = true;
 	async_callbacks.add(types::async_request_complete{
 		.request_ids = {req_id},
 	});
@@ -111,7 +115,7 @@ void async_reference::enqueue_execution_options(
 	ecsact_async_request_id         req_id,
 	const ecsact_execution_options& options
 ) {
-	if(!is_connected) {
+	if(!is_connected_) {
 		async_callbacks.add(types::async_error{
 			.error = ECSACT_ASYNC_ERR_NOT_CONNECTED,
 			.request_ids = {req_id},
@@ -140,7 +144,7 @@ void async_reference::execute_systems() {
 
 		nanoseconds execution_duration = {};
 
-		while(is_connected == true) {
+		while(is_connected_ == true) {
 			auto event = tick_manager.validate_pending_options();
 
 			std::visit(
@@ -159,7 +163,7 @@ void async_reference::execute_systems() {
 					.request_ids = err->request_ids,
 				});
 
-				is_connected = false;
+				is_connected_ = false;
 				break;
 			}
 
@@ -192,7 +196,7 @@ void async_reference::execute_systems() {
 
 			if(systems_error != ECSACT_EXEC_SYS_OK) {
 				async_callbacks.add(systems_error);
-				is_connected = false;
+				is_connected_ = false;
 				return;
 			}
 		}
@@ -212,7 +216,7 @@ int32_t async_reference::get_current_tick() {
 }
 
 void async_reference::disconnect() {
-	is_connected = false;
+	is_connected_ = false;
 	if(execution_thread.joinable()) {
 		execution_thread.join();
 	}
