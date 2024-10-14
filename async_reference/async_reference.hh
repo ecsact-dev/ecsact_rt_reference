@@ -29,7 +29,7 @@ public:
 		ecsact_entity_id        entity,
 		ecsact_component_id     component_id,
 		const void*             component_data,
-		...
+		const void*             indexed_fields
 	);
 
 	void execute_systems();

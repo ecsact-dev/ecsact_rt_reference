@@ -17,6 +17,7 @@ ecsact_build_recipe(
         "ecsact_serialize_action_size",
         "ecsact_serialize_component",
         "ecsact_serialize_component_size",
+        "ecsact_stream",
     ],
     exports = [
         "ecsact_async_connect",

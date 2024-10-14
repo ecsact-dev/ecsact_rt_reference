@@ -204,11 +204,16 @@ void async_reference::stream(
 	ecsact_entity_id        entity,
 	ecsact_component_id     component_id,
 	const void*             component_data,
-	...
+	const void*             indexed_fields
 ) {
 	if(registry_id) {
-		auto stream_error =
-			ecsact_stream(registry_id.value(), entity, component_id, component_data);
+		auto stream_error = ecsact_stream(
+			registry_id.value(),
+			entity,
+			component_id,
+			component_data,
+			indexed_fields
+		);
 
 		async_callbacks.add(types::async_request_complete{{req_id}});
 	} else {

@@ -66,9 +66,18 @@ ecsact_async_request_id ecsact_async_stream(
 	ecsact_entity_id    entity,
 	ecsact_component_id component_id,
 	const void*         component_data,
-	...
+	const void*         indexed_fields
 ) {
 	auto req_id = request_id_factory.next_id();
+	// TODO: indexed fields
+	if(indexed_fields != nullptr) {
+		async_callbacks.add(detail::types::async_error{
+			.error = ECSACT_ASYNC_ERR_INTERNAL,
+			.request_ids = {req_id},
+		});
+		return req_id;
+	}
+
 	if(!reference) {
 		async_callbacks.add(detail::types::async_error{
 			.error = ECSACT_ASYNC_ERR_NOT_CONNECTED,
@@ -77,6 +86,12 @@ ecsact_async_request_id ecsact_async_stream(
 		return req_id;
 	}
 
-	reference->stream(req_id, entity, component_id, component_data);
+	reference->stream( //
+		req_id,
+		entity,
+		component_id,
+		component_data,
+		indexed_fields
+	);
 	return req_id;
 }
