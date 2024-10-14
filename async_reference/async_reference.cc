@@ -1,9 +1,9 @@
 #include <chrono>
 #include <map>
-
 #include "ecsact/runtime/core.h"
 #include "async_reference/async_reference.hh"
 #include "async_reference/util/util.hh"
+#include "async_reference/util/types.hh"
 
 using namespace ecsact::async_reference::detail;
 
@@ -197,6 +197,28 @@ void async_reference::execute_systems() {
 			}
 		}
 	});
+}
+
+void async_reference::stream(
+	ecsact_async_request_id req_id,
+	ecsact_entity_id        entity,
+	ecsact_component_id     component_id,
+	const void*             component_data,
+	const void*             indexed_fields
+) {
+	if(registry_id) {
+		auto stream_error = ecsact_stream(
+			registry_id.value(),
+			entity,
+			component_id,
+			component_data,
+			indexed_fields
+		);
+
+		async_callbacks.add(types::async_request_complete{{req_id}});
+	} else {
+		async_callbacks.add(types::async_request_complete{{req_id}});
+	}
 }
 
 void async_reference::invoke_execution_events(

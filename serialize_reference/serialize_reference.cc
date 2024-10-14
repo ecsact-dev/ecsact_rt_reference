@@ -350,13 +350,21 @@ ecsact_restore_error ecsact_restore_entities(
 			auto component_data =
 				ecsact::deserialize(component_id, serialized_component_data);
 
-			if(ecsact_has_component(registry_id, entity_id, component_id)) {
+			if(ecsact_has_component(
+					 registry_id,
+					 entity_id,
+					 component_id,
+					 // TODO: indexed fields
+					 nullptr
+				 )) {
 				if(component_size != 0) {
 					ecsact_update_component(
 						registry_id,
 						entity_id,
 						component_id,
-						component_data.data()
+						component_data.data(),
+						// TODO: indexed fields
+						nullptr
 					);
 				}
 				updated_components.push_back({entity_id, component_id});
@@ -396,7 +404,13 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_INIT_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->init_callback_user_data
 				);
 			}
@@ -408,7 +422,13 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_UPDATE_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->update_callback_user_data
 				);
 			}
@@ -420,11 +440,23 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_REMOVE_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->remove_callback_user_data
 				);
 
-				ecsact_remove_component(registry_id, entity, comp_id);
+				ecsact_remove_component(
+					registry_id,
+					entity,
+					comp_id,
+					// TODO: indexed fields
+					nullptr
+				);
 			}
 		}
 

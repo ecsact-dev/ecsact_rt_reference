@@ -90,7 +90,8 @@ void execution_callbacks::invoke(
 			const void* component_data = ecsact_get_component(
 				registry_id,
 				component_info.entity_id,
-				component_info.component_id
+				component_info.component_id,
+				nullptr // TODO: indeded fields
 			);
 
 			execution_events->init_callback(
@@ -108,7 +109,8 @@ void execution_callbacks::invoke(
 			const void* component_data = ecsact_get_component(
 				registry_id,
 				component_info.entity_id,
-				component_info.component_id
+				component_info.component_id,
+				nullptr // TODO: indeded fields
 			);
 
 			execution_events->update_callback(

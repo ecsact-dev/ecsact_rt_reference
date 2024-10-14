@@ -1,5 +1,6 @@
 #include <optional>
-
+#include <stdarg.h>
+#include <span>
 #include "ecsact/runtime/async.h"
 #include "async_reference/async_reference.hh"
 #include "async_reference/callbacks/async_callbacks.hh"
@@ -59,4 +60,38 @@ int32_t ecsact_async_get_current_tick() {
 		return reference->get_current_tick();
 	}
 	return 0;
+}
+
+ecsact_async_request_id ecsact_async_stream(
+	ecsact_entity_id    entity,
+	ecsact_component_id component_id,
+	const void*         component_data,
+	const void*         indexed_fields
+) {
+	auto req_id = request_id_factory.next_id();
+	// TODO: indexed fields
+	if(indexed_fields != nullptr) {
+		async_callbacks.add(detail::types::async_error{
+			.error = ECSACT_ASYNC_ERR_INTERNAL,
+			.request_ids = {req_id},
+		});
+		return req_id;
+	}
+
+	if(!reference) {
+		async_callbacks.add(detail::types::async_error{
+			.error = ECSACT_ASYNC_ERR_NOT_CONNECTED,
+			.request_ids = {req_id},
+		});
+		return req_id;
+	}
+
+	reference->stream( //
+		req_id,
+		entity,
+		component_id,
+		component_data,
+		indexed_fields
+	);
+	return req_id;
 }
