@@ -396,7 +396,13 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_INIT_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->init_callback_user_data
 				);
 			}
@@ -408,7 +414,13 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_UPDATE_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->update_callback_user_data
 				);
 			}
@@ -420,7 +432,13 @@ ecsact_restore_error ecsact_restore_entities(
 					ECSACT_EVENT_REMOVE_COMPONENT,
 					entity,
 					comp_id,
-					ecsact_get_component(registry_id, entity, comp_id),
+					ecsact_get_component(
+						registry_id,
+						entity,
+						comp_id,
+						// TODO: indexed fields
+						nullptr
+					),
 					events_collector->remove_callback_user_data
 				);
 
