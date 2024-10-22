@@ -2,6 +2,23 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.1.2 - 2024-10-22
+#### Features
+- new async stream api (#27) - (5ca90a5) - Ezekiel Warren
+#### Miscellaneous Chores
+- **(deps)** update dependency ecsact_lang_cpp to v0.4.10 (#32) - (0f718cb) - renovate[bot]
+- **(deps)** update ecsact repositories (#31) - (a73a863) - renovate[bot]
+- **(deps)** update dependency ecsact_lang_cpp to v0.4.8 (#30) - (5b2a286) - renovate[bot]
+- **(deps)** update dependency ecsact_codegen to v0.4.2 (#29) - (9ad0623) - renovate[bot]
+- **(deps)** update ecsact repositories (#28) - (ab7d699) - renovate[bot]
+- **(deps)** update dependency ecsact_lang_cpp to v0.4.7 (#25) - (573e0d3) - renovate[bot]
+- **(deps)** update ecsact repositories (#24) - (d4e61b9) - renovate[bot]
+- **(deps)** update ecsact repositories (#18) - (1da83ae) - renovate[bot]
+- sync with ecsact_common (#22) - (dc2adb2) - seaubot
+- formatting - (c35800b) - Ezekiel Warren
+
+- - -
+
 ## 0.1.1 - 2024-08-10
 #### Features
 - renamed bundles for ecsact CLI SDK discovery - (b37d065) - Ezekiel Warren
