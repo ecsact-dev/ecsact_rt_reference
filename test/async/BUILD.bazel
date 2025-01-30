@@ -1,10 +1,45 @@
-load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
+load("@ecsact_runtime//bazel:copts.bzl", "copts")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary", "ecsact_codegen")
 
 package(default_visibility = ["//:__pkg__"])
 
 ecsact_binary(
     name = "async",
+    srcs = ["async_test.ecsact"],
     allow_unresolved_imports = True,
     recipes = ["@ecsact_rt_reference//async_reference"],
+)
+
+ecsact_codegen(
+    name = "test_generated_srcs",
     srcs = ["async_test.ecsact"],
+    output_directory = "_generated",
+    plugins = [
+        "@ecsact_lang_cpp//cpp_header_codegen",
+        "@ecsact_lang_cpp//cpp_systems_header_codegen",
+        "@ecsact_lang_cpp//cpp_systems_source_codegen",
+        "@ecsact_lang_cpp//systems_header_codegen",
+    ],
+)
+
+cc_test(
+    name = "async_ref_test",
+    srcs = [
+        "async_ref_test.cc",
+        ":test_generated_srcs",
+    ],
+    args = ["--gtest_catch_exceptions=0"],
+    copts = copts,
+    # TODO: Can re-enable when allow_unresolved_imports is set to False
+    tags = ["manual"],
+    deps = [
+        ":async",
+        "@ecsact_lang_cpp//:execution_context",
+        "@ecsact_lang_cpp//:support",
+        "@ecsact_runtime//:async",
+        "@ecsact_runtime//:common",
+        "@ecsact_runtime//:core",
+        "@googletest//:gtest_main",
+    ],
 )
