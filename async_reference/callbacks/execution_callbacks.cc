@@ -23,23 +23,59 @@ ecsact_execution_events_collector* execution_callbacks::get_collector() {
 	return &collector;
 }
 
-void execution_callbacks::invoke(
+auto execution_callbacks::clear() -> void {
+	auto lk = std::unique_lock{execution_m};
+	init_callbacks_info.clear();
+	update_callbacks_info.clear();
+	remove_callbacks_info.clear();
+	create_entity_callbacks_info.clear();
+	destroy_entity_callbacks_info.clear();
+	removed_execute_components.clear();
+}
+
+auto execution_callbacks::append(const execution_callbacks& other) -> void {
+	init_callbacks_info.insert(
+		init_callbacks_info.end(),
+		other.init_callbacks_info.begin(),
+		other.init_callbacks_info.end()
+	);
+	update_callbacks_info.insert(
+		update_callbacks_info.end(),
+		other.update_callbacks_info.begin(),
+		other.update_callbacks_info.end()
+	);
+	remove_callbacks_info.insert(
+		remove_callbacks_info.end(),
+		other.remove_callbacks_info.begin(),
+		other.remove_callbacks_info.end()
+	);
+	create_entity_callbacks_info.insert(
+		create_entity_callbacks_info.end(),
+		other.create_entity_callbacks_info.begin(),
+		other.create_entity_callbacks_info.end()
+	);
+	destroy_entity_callbacks_info.insert(
+		destroy_entity_callbacks_info.end(),
+		other.destroy_entity_callbacks_info.begin(),
+		other.destroy_entity_callbacks_info.end()
+	);
+	removed_execute_components.insert(
+		removed_execute_components.end(),
+		other.removed_execute_components.begin(),
+		other.removed_execute_components.end()
+	);
+}
+
+auto execution_callbacks::invoke(
 	const ecsact_execution_events_collector* execution_events,
 	ecsact_registry_id                       registry_id
-) {
+) -> void {
 	if(!has_callbacks()) {
 		return;
 	}
 
 	if(execution_events == nullptr) {
-		if(has_callbacks()) {
-			std::unique_lock lk(execution_m);
-			init_callbacks_info.clear();
-			update_callbacks_info.clear();
-			remove_callbacks_info.clear();
-			create_entity_callbacks_info.clear();
-			destroy_entity_callbacks_info.clear();
-		}
+		clear();
 		return;
 	}
 
@@ -130,8 +166,10 @@ void execution_callbacks::invoke(
 					 execute_component._id != component_info.component_id) {
 					continue;
 				}
-				auto deserialized_component =
-					ecsact::deserialize(execute_component._id, execute_component.data);
+				auto deserialized_component = ecsact::deserialize( //
+					execute_component._id,
+					execute_component.data
+				);
 
 				execution_events->remove_callback(
 					component_info.event,
@@ -156,7 +194,7 @@ void execution_callbacks::invoke(
 	}
 }
 
-bool execution_callbacks::has_callbacks() {
+auto execution_callbacks::has_callbacks() const -> bool {
 	if(init_callbacks_info.size() > 0) {
 		return true;
 	}

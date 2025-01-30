@@ -20,11 +20,11 @@ ecsact_build_recipe(
         "ecsact_stream",
     ],
     exports = [
-        "ecsact_async_connect",
-        "ecsact_async_disconnect",
         "ecsact_async_enqueue_execution_options",
         "ecsact_async_flush_events",
         "ecsact_async_get_current_tick",
+        "ecsact_async_start",
+        "ecsact_async_stop",
         "ecsact_async_stream",
     ],
 )

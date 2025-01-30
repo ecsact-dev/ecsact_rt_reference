@@ -10,16 +10,20 @@ class execution_callbacks {
 public:
 	execution_callbacks();
 
-	void invoke(
+	auto invoke(
 		const ecsact_execution_events_collector* execution_events,
 		ecsact_registry_id                       registry_id
-	);
+	) -> void;
 
-	ecsact_execution_events_collector* get_collector();
+	auto get_collector() -> ecsact_execution_events_collector*;
 
 	inline auto lock() -> std::unique_lock<std::mutex> {
-		return std::unique_lock(execution_m);
+		return std::unique_lock{execution_m};
 	}
+
+	auto append(const execution_callbacks& other) -> void;
+
+	auto clear() -> void;
 
 private:
 	ecsact_execution_events_collector collector;
@@ -34,7 +38,7 @@ private:
 	std::vector<types::entity_callback_info> create_entity_callbacks_info;
 	std::vector<types::entity_callback_info> destroy_entity_callbacks_info;
 
-	bool has_callbacks();
+	auto has_callbacks() const -> bool;
 
 	static void init_callback(
 		ecsact_event        event,
