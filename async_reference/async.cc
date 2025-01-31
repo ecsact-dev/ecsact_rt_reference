@@ -29,7 +29,7 @@ auto ecsact_async_start( //
 	int32_t     option_data_size
 ) -> ecsact_async_session_id {
 	if(!reference) {
-		reference.emplace();
+		reference.emplace(async_callbacks);
 	}
 
 	auto session_id = generate_next_session_id();
@@ -63,13 +63,13 @@ auto ecsact_async_flush_events(
 	const ecsact_execution_events_collector* execution_evc,
 	const ecsact_async_events_collector*     async_evc
 ) -> void {
-	async_callbacks[session_id].invoke(session_id, async_evc);
-
 	if(!reference) {
+		async_callbacks[session_id].invoke(session_id, async_evc);
 		return;
 	}
 
 	reference->flush_events(session_id, execution_evc, async_evc);
+	async_callbacks[session_id].invoke(session_id, async_evc);
 }
 
 auto ecsact_async_enqueue_execution_options(

@@ -58,6 +58,21 @@ static auto _invoke(
 	);
 }
 
+static auto _invoke(
+	ecsact_async_session_id              session_id,
+	const ecsact_async_events_collector* async_evc,
+	ecsact_async_session_event           event
+) -> void {
+	if(async_evc->async_session_event_callback == nullptr) {
+		return;
+	}
+	async_evc->async_session_event_callback(
+		session_id,
+		event,
+		async_evc->async_session_event_callback_user_data
+	);
+}
+
 void async_callbacks::invoke(
 	ecsact_async_session_id              session_id,
 	const ecsact_async_events_collector* async_evc

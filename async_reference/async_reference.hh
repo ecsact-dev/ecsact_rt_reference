@@ -7,6 +7,7 @@
 #include <string_view>
 #include <memory>
 #include <span>
+#include <map>
 #include <unordered_map>
 #include "tick_manager/tick_manager.hh"
 #include "callbacks/execution_callbacks.hh"
@@ -15,7 +16,10 @@
 namespace ecsact::async_reference::detail {
 class async_reference {
 public:
-	inline async_reference() {
+	inline async_reference(
+		std::map<ecsact_async_session_id, detail::async_callbacks>& async_callbacks
+	)
+		: async_callbacks(async_callbacks) {
 	}
 
 	inline ~async_reference() {
@@ -60,6 +64,8 @@ private:
 	using sessions_t =
 		std::unordered_map<ecsact_async_session_id, std::shared_ptr<session>>;
 	sessions_t sessions;
+
+	std::map<ecsact_async_session_id, detail::async_callbacks>& async_callbacks;
 
 	std::atomic_int32_t               _last_request_id = 0;
 	std::optional<ecsact_registry_id> registry_id;

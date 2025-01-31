@@ -93,7 +93,10 @@ struct pending_execution_options {
 	types::cpp_execution_options options;
 };
 
-using async_requests = std::
-	variant<ecsact_execute_systems_error, async_error, async_request_complete>;
+using async_requests = std::variant<
+	ecsact_execute_systems_error,
+	async_error,
+	async_request_complete,
+	ecsact_async_session_event>;
 
 } // namespace ecsact::async_reference::detail::types

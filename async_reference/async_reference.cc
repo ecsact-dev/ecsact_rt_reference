@@ -62,6 +62,8 @@ auto async_reference::start(
 	auto lk = std::unique_lock{execution_m};
 	auto result = parse_connection_string(connect_str);
 
+	async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_PENDING);
+
 	if(result.options.contains("delta_time")) {
 		auto tick_str = result.options.at("delta_time");
 
@@ -76,22 +78,20 @@ auto async_reference::start(
 	if(result.host != "good") {
 		// is_connected = false;
 
-		// async_callbacks.add(types::async_error{
-		// 	.error = ECSACT_ASYNC_ERR_PERMISSION_DENIED,
-		// 	.request_ids = {ECSACT_INVALID_ID(async_request)},
-		// });
-		//
-		// async_callbacks.add(types::async_request_complete{
-		// 	.request_ids = {ECSACT_INVALID_ID(async_request)},
-		// });
+		async_callbacks[session_id].add(types::async_error{
+			.error = ECSACT_ASYNC_ERR_PERMISSION_DENIED,
+			.request_ids = {ECSACT_INVALID_ID(async_request)},
+		});
+		async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_STOPPED);
 		return;
 	}
 
 	if(delta_time.count() < 0) {
-		// async_callbacks.add(types::async_error{
-		// 	.error = ECSACT_ASYNC_INVALID_CONNECTION_STRING,
-		// 	.request_ids = {ECSACT_INVALID_ID(async_request)},
-		// });
+		async_callbacks[session_id].add(types::async_error{
+			.error = ECSACT_ASYNC_INVALID_CONNECTION_STRING,
+			.request_ids = {ECSACT_INVALID_ID(async_request)},
+		});
+		async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_STOPPED);
 		return;
 	}
 
@@ -102,6 +102,8 @@ auto async_reference::start(
 	if(!running) {
 		execute_systems();
 	}
+
+	async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_START);
 }
 
 void async_reference::enqueue_execution_options(
@@ -157,9 +159,12 @@ void async_reference::execute_systems() {
 			);
 
 			if(auto err = std::get_if<types::async_error>(&event)) {
-				// async_callbacks.add(types::async_request_complete{
-				// 	.request_ids = err->request_ids,
-				// });
+				for(auto&& [session_id, async_callbacks] : async_callbacks) {
+					async_callbacks.add(types::async_request_complete{
+						.request_ids = err->request_ids,
+					});
+					async_callbacks.add(ECSACT_ASYNC_SESSION_STOPPED);
+				}
 
 				running = false;
 				break;
@@ -202,6 +207,10 @@ void async_reference::execute_systems() {
 
 			if(systems_error != ECSACT_EXEC_SYS_OK) {
 				running = false;
+				for(auto&& [session_id, async_callbacks] : async_callbacks) {
+					async_callbacks.add(systems_error);
+					async_callbacks.add(ECSACT_ASYNC_SESSION_STOPPED);
+				}
 				return;
 			}
 		}
@@ -249,8 +258,18 @@ auto async_reference::get_current_tick( //
 }
 
 auto async_reference::stop(ecsact_async_session_id session_id) -> void {
+	auto itr = sessions.find(session_id);
+	if(itr != sessions.end()) {
+		async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_STOPPED);
+		sessions.erase(itr);
+	}
 	if(sessions.empty()) {
 		running = false;
+		for(auto&& [other_session_id, async_callbacks] : async_callbacks) {
+			if(other_session_id != session_id) {
+				async_callbacks.add(ECSACT_ASYNC_SESSION_STOPPED);
+			}
+		}
 		if(execution_thread.joinable()) {
 			execution_thread.join();
 		}
