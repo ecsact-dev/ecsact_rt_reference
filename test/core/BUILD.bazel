@@ -1,0 +1,11 @@
+load("@ecsact_runtime//bazel:copts.bzl", "copts")
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_binary")
+
+package(default_visibility = ["//:__pkg__"])
+
+ecsact_binary(
+    name = "core",
+    srcs = ["core_test.ecsact"],
+    allow_unresolved_imports = False,
+    recipes = ["@ecsact_rt_reference//core_reference"],
+)

@@ -7,8 +7,12 @@ package(default_visibility = ["//:__pkg__"])
 ecsact_binary(
     name = "async",
     srcs = ["async_test.ecsact"],
-    allow_unresolved_imports = True,
-    recipes = ["@ecsact_rt_reference//async_reference"],
+    allow_unresolved_imports = False,
+    recipes = [
+        "@ecsact_rt_reference//async_reference",
+        "@ecsact_rt_reference//serialize_reference",
+        "@ecsact_rt_reference//core_reference",
+    ],
 )
 
 ecsact_codegen(
@@ -31,7 +35,7 @@ cc_test(
     ],
     args = ["--gtest_catch_exceptions=0"],
     copts = copts,
-    # TODO: Can re-enable when allow_unresolved_imports is set to False
+    # TODO: can only enable when core and dynamic reference is properly implemented
     tags = ["manual"],
     deps = [
         ":async",

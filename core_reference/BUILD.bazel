@@ -1,0 +1,55 @@
+load("@rules_ecsact//ecsact:defs.bzl", "ecsact_build_recipe", "ecsact_build_recipe_bundle")
+
+package(default_visibility = ["//visibility:public"])
+
+ecsact_build_recipe(
+    name = "core_reference_build_recipe",
+    srcs = [
+        ":sources",
+    ],
+    imports = [
+    ],
+    exports = [
+        "ecsact_add_component",
+        "ecsact_clear_registry",
+        "ecsact_clone_registry",
+        "ecsact_count_components",
+        "ecsact_count_entities",
+        "ecsact_create_entity",
+        "ecsact_create_registry",
+        "ecsact_destroy_entity",
+        "ecsact_destroy_registry",
+        "ecsact_each_component",
+        "ecsact_ensure_entity",
+        "ecsact_entity_exists",
+        "ecsact_execute_systems",
+        "ecsact_get_component",
+        "ecsact_get_components",
+        "ecsact_get_entities",
+        "ecsact_get_entity_execution_status",
+        "ecsact_has_component",
+        "ecsact_hash_registry",
+        "ecsact_remove_component",
+        "ecsact_stream",
+        "ecsact_update_component",
+    ],
+)
+
+alias(
+    name = "core_reference",
+    actual = ":ecsact_core_reference",
+)
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "**/*.cc",
+        "**/*.hh",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+ecsact_build_recipe_bundle(
+    name = "ecsact_core_reference",
+    recipes = [":core_reference_build_recipe"],
+)

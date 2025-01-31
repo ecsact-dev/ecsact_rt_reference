@@ -24,7 +24,6 @@ ecsact_execution_events_collector* execution_callbacks::get_collector() {
 }
 
 auto execution_callbacks::clear() -> void {
-	auto lk = std::unique_lock{execution_m};
 	init_callbacks_info.clear();
 	update_callbacks_info.clear();
 	remove_callbacks_info.clear();
@@ -88,8 +87,6 @@ auto execution_callbacks::invoke(
 
 	std::vector<types::cpp_execution_component> remove_execution_components;
 
-	std::unique_lock lk(execution_m);
-
 	init_callbacks = std::move(init_callbacks_info);
 	update_callbacks = std::move(update_callbacks_info);
 	remove_callbacks = std::move(remove_callbacks_info);
@@ -107,8 +104,6 @@ auto execution_callbacks::invoke(
 	destroy_entity_callbacks_info.clear();
 
 	removed_execute_components.clear();
-
-	lk.unlock();
 
 	if(execution_events->entity_created_callback != nullptr) {
 		for(auto& info : entity_created_callbacks) {

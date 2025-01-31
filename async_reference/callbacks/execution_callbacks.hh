@@ -17,17 +17,12 @@ public:
 
 	auto get_collector() -> ecsact_execution_events_collector*;
 
-	inline auto lock() -> std::unique_lock<std::mutex> {
-		return std::unique_lock{execution_m};
-	}
-
 	auto append(const execution_callbacks& other) -> void;
 
 	auto clear() -> void;
 
 private:
 	ecsact_execution_events_collector collector;
-	std::mutex                        execution_m;
 
 	std::vector<types::cpp_execution_component> removed_execute_components;
 

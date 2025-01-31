@@ -184,7 +184,6 @@ void async_reference::execute_systems() {
 			}
 			auto options = c_exec_options.c();
 
-			auto exec_lk = main_exec_callbacks.lock();
 			auto systems_error = ecsact_execute_systems( //
 				*registry_id,
 				1,
@@ -193,12 +192,10 @@ void async_reference::execute_systems() {
 			);
 
 			for(auto&& [session_id, session] : sessions) {
-				auto lk = session->exec_callbacks.lock();
 				session->exec_callbacks.append(main_exec_callbacks);
 			}
 
 			main_exec_callbacks.clear();
-			exec_lk.unlock();
 
 			auto end = clock::now();
 			execution_duration = duration_cast<nanoseconds>(end - start);
