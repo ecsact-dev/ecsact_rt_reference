@@ -22,11 +22,13 @@ struct callback_info {
 };
 
 struct async_error {
+	ecsact_async_session_id              session_id;
 	ecsact_async_error                   error;
 	std::vector<ecsact_async_request_id> request_ids;
 };
 
 struct async_request_complete {
+	ecsact_async_session_id              session_id;
 	std::vector<ecsact_async_request_id> request_ids;
 };
 
@@ -89,6 +91,7 @@ struct cpp_execution_options {
 };
 
 struct pending_execution_options {
+	ecsact_async_session_id      session_id;
 	ecsact_async_request_id      request_id;
 	types::cpp_execution_options options;
 };

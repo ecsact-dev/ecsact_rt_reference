@@ -128,10 +128,10 @@ void async_reference::enqueue_execution_options(
 	auto cpp_options = util::c_to_cpp_execution_options(options);
 
 	tick_manager.add_pending_options(types::pending_execution_options{
+		.session_id = session_id,
 		.request_id = req_id,
 		.options = cpp_options,
 	});
-	return;
 }
 
 void async_reference::execute_systems() {
@@ -153,7 +153,7 @@ void async_reference::execute_systems() {
 						return;
 					}
 
-					// async_callbacks.add(event);
+					async_callbacks[event.session_id].add(event);
 				},
 				event
 			);
