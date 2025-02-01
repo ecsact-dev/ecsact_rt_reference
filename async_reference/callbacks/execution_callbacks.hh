@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include <mutex>
 
 #include "../util/types.hh"
@@ -24,7 +25,9 @@ public:
 private:
 	ecsact_execution_events_collector collector;
 
-	std::vector<types::cpp_execution_component> removed_execute_components;
+	// NOTE: This is very inefficient
+	std::unordered_multimap<ecsact_entity_id, types::cpp_execution_component>
+		comp_cache;
 
 	std::vector<types::callback_info> init_callbacks_info;
 	std::vector<types::callback_info> update_callbacks_info;
@@ -34,6 +37,19 @@ private:
 	std::vector<types::entity_callback_info> destroy_entity_callbacks_info;
 
 	auto has_callbacks() const -> bool;
+
+	auto add_component_cache(
+		ecsact_entity_id    entity,
+		ecsact_component_id component_id,
+		const void*         component_data
+	) -> void;
+
+	auto get_component_cache(
+		ecsact_entity_id    entity,
+		ecsact_component_id component_id
+	) -> const void*;
+
+	auto merge_cache(const execution_callbacks& other) -> void;
 
 	static void init_callback(
 		ecsact_event        event,

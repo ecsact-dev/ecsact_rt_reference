@@ -103,6 +103,11 @@ auto async_reference::start(
 		execute_systems();
 	}
 
+	sessions.emplace_hint( //
+		sessions.end(),
+		session_id,
+		std::make_shared<session>()
+	);
 	async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_START);
 }
 
@@ -111,6 +116,8 @@ void async_reference::enqueue_execution_options(
 	ecsact_async_request_id         req_id,
 	const ecsact_execution_options& options
 ) {
+	auto lk = std::unique_lock{execution_m};
+
 	if(!sessions.contains(session_id)) {
 		return;
 	}
@@ -142,18 +149,22 @@ void async_reference::execute_systems() {
 		using nanoseconds = std::chrono::nanoseconds;
 		using std::chrono::duration_cast;
 
-		nanoseconds execution_duration = {};
+		auto execution_duration = nanoseconds{};
 
 		while(running) {
+			if(delta_time.count() > 0) {
+				const auto sleep_duration = delta_time - execution_duration;
+				std::this_thread::sleep_for(sleep_duration);
+			}
+
+			auto lk = std::unique_lock{execution_m};
 			auto event = tick_manager.validate_pending_options();
 
 			std::visit(
 				[&](auto&& event) {
-					if(event.request_ids.empty()) {
-						return;
+					for(auto&& [session_id, async_callbacks] : async_callbacks) {
+						async_callbacks.add(event);
 					}
-
-					async_callbacks[event.session_id].add(event);
 				},
 				event
 			);
@@ -161,6 +172,8 @@ void async_reference::execute_systems() {
 			if(auto err = std::get_if<types::async_error>(&event)) {
 				for(auto&& [session_id, async_callbacks] : async_callbacks) {
 					async_callbacks.add(types::async_request_complete{
+						// NOTE: this is stupid.
+						.session_id = session_id,
 						.request_ids = err->request_ids,
 					});
 					async_callbacks.add(ECSACT_ASYNC_SESSION_STOPPED);
@@ -168,11 +181,6 @@ void async_reference::execute_systems() {
 
 				running = false;
 				break;
-			}
-
-			if(delta_time.count() > 0) {
-				const auto sleep_duration = delta_time - execution_duration;
-				std::this_thread::sleep_for(sleep_duration);
 			}
 
 			auto start = clock::now();
@@ -225,6 +233,7 @@ void async_reference::stream(
 	const void*             indexed_fields
 ) {
 	if(registry_id) {
+		auto lk = std::unique_lock{execution_m};
 		ecsact_stream(
 			registry_id.value(),
 			entity,
@@ -241,6 +250,7 @@ void async_reference::flush_events(
 	const ecsact_async_events_collector*     async_evc
 ) {
 	if(registry_id) {
+		auto lk = std::unique_lock{execution_m};
 		auto itr = sessions.find(session_id);
 		if(itr != sessions.end()) {
 			itr->second->exec_callbacks.invoke(execution_evc, *registry_id);
@@ -251,6 +261,7 @@ void async_reference::flush_events(
 auto async_reference::get_current_tick( //
 	ecsact_async_session_id session_id
 ) -> int32_t {
+	auto lk = std::unique_lock{execution_m};
 	if(sessions.contains(session_id)) {
 		return tick_manager.get_current_tick();
 	}
@@ -260,6 +271,7 @@ auto async_reference::get_current_tick( //
 auto async_reference::stop(ecsact_async_session_id session_id) -> void {
 	auto itr = sessions.find(session_id);
 	if(itr != sessions.end()) {
+		auto lk = std::unique_lock{execution_m};
 		async_callbacks[session_id].add(ECSACT_ASYNC_SESSION_STOPPED);
 		sessions.erase(itr);
 	}
@@ -277,5 +289,6 @@ auto async_reference::stop(ecsact_async_session_id session_id) -> void {
 }
 
 auto async_reference::session_count() -> int32_t {
+	auto lk = std::unique_lock{execution_m};
 	return static_cast<int32_t>(sessions.size());
 }

@@ -86,9 +86,9 @@ void cpp_to_c_execution_options(
 	const ecsact_registry_id&     registry_id
 );
 
-types::cpp_execution_options c_to_cpp_execution_options(
+auto c_to_cpp_execution_options( //
 	const ecsact_execution_options& options
-);
+) -> types::cpp_execution_options;
 
 ecsact_async_error validate_options(types::cpp_execution_options& options);
 

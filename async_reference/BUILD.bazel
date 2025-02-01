@@ -12,7 +12,6 @@ ecsact_build_recipe(
         "ecsact_deserialize_action",
         "ecsact_deserialize_component",
         "ecsact_execute_systems",
-        "ecsact_get_component",
         "ecsact_serialize_action",
         "ecsact_serialize_action_size",
         "ecsact_serialize_component",
