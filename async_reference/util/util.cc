@@ -220,9 +220,9 @@ void util::cpp_to_c_execution_options(
 	}
 }
 
-types::cpp_execution_options util::c_to_cpp_execution_options(
+auto util::c_to_cpp_execution_options( //
 	const ecsact_execution_options& options
-) {
+) -> types::cpp_execution_options {
 	auto cpp_options = types::cpp_execution_options{};
 	cpp_options.adds.reserve(options.add_components_length);
 	cpp_options.updates.reserve(options.update_components_length);

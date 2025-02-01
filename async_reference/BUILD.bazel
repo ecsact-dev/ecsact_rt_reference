@@ -12,7 +12,6 @@ ecsact_build_recipe(
         "ecsact_deserialize_action",
         "ecsact_deserialize_component",
         "ecsact_execute_systems",
-        "ecsact_get_component",
         "ecsact_serialize_action",
         "ecsact_serialize_action_size",
         "ecsact_serialize_component",
@@ -20,11 +19,11 @@ ecsact_build_recipe(
         "ecsact_stream",
     ],
     exports = [
-        "ecsact_async_connect",
-        "ecsact_async_disconnect",
         "ecsact_async_enqueue_execution_options",
         "ecsact_async_flush_events",
         "ecsact_async_get_current_tick",
+        "ecsact_async_start",
+        "ecsact_async_stop",
         "ecsact_async_stream",
     ],
 )

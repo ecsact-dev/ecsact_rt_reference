@@ -1,5 +1,7 @@
 #include "async_reference/callbacks/execution_callbacks.hh"
 
+#include <ranges>
+#include <algorithm>
 #include "ecsact/runtime/serialize.hh"
 
 using namespace ecsact::async_reference::detail;
@@ -23,23 +25,55 @@ ecsact_execution_events_collector* execution_callbacks::get_collector() {
 	return &collector;
 }
 
-void execution_callbacks::invoke(
+auto execution_callbacks::clear() -> void {
+	init_callbacks_info.clear();
+	update_callbacks_info.clear();
+	remove_callbacks_info.clear();
+	create_entity_callbacks_info.clear();
+	destroy_entity_callbacks_info.clear();
+	comp_cache.clear();
+}
+
+auto execution_callbacks::append(const execution_callbacks& other) -> void {
+	init_callbacks_info.insert(
+		init_callbacks_info.end(),
+		other.init_callbacks_info.begin(),
+		other.init_callbacks_info.end()
+	);
+	update_callbacks_info.insert(
+		update_callbacks_info.end(),
+		other.update_callbacks_info.begin(),
+		other.update_callbacks_info.end()
+	);
+	remove_callbacks_info.insert(
+		remove_callbacks_info.end(),
+		other.remove_callbacks_info.begin(),
+		other.remove_callbacks_info.end()
+	);
+	create_entity_callbacks_info.insert(
+		create_entity_callbacks_info.end(),
+		other.create_entity_callbacks_info.begin(),
+		other.create_entity_callbacks_info.end()
+	);
+	destroy_entity_callbacks_info.insert(
+		destroy_entity_callbacks_info.end(),
+		other.destroy_entity_callbacks_info.begin(),
+		other.destroy_entity_callbacks_info.end()
+	);
+
+	merge_cache(other);
+}
+
+auto execution_callbacks::invoke(
 	const ecsact_execution_events_collector* execution_events,
 	ecsact_registry_id                       registry_id
-) {
+) -> void {
 	if(!has_callbacks()) {
 		return;
 	}
 
 	if(execution_events == nullptr) {
-		if(has_callbacks()) {
-			std::unique_lock lk(execution_m);
-			init_callbacks_info.clear();
-			update_callbacks_info.clear();
-			remove_callbacks_info.clear();
-			create_entity_callbacks_info.clear();
-			destroy_entity_callbacks_info.clear();
-		}
+		clear();
 		return;
 	}
 
@@ -50,10 +84,6 @@ void execution_callbacks::invoke(
 	std::vector<types::entity_callback_info> entity_created_callbacks;
 	std::vector<types::entity_callback_info> entity_destroyed_callbacks;
 
-	std::vector<types::cpp_execution_component> remove_execution_components;
-
-	std::unique_lock lk(execution_m);
-
 	init_callbacks = std::move(init_callbacks_info);
 	update_callbacks = std::move(update_callbacks_info);
 	remove_callbacks = std::move(remove_callbacks_info);
@@ -61,18 +91,12 @@ void execution_callbacks::invoke(
 	entity_created_callbacks = std::move(create_entity_callbacks_info);
 	entity_destroyed_callbacks = std::move(destroy_entity_callbacks_info);
 
-	remove_execution_components = std::move(removed_execute_components);
-
 	init_callbacks_info.clear();
 	update_callbacks_info.clear();
 	remove_callbacks_info.clear();
 
 	create_entity_callbacks_info.clear();
 	destroy_entity_callbacks_info.clear();
-
-	removed_execute_components.clear();
-
-	lk.unlock();
 
 	if(execution_events->entity_created_callback != nullptr) {
 		for(auto& info : entity_created_callbacks) {
@@ -87,18 +111,14 @@ void execution_callbacks::invoke(
 
 	if(execution_events->init_callback != nullptr) {
 		for(auto& component_info : init_callbacks) {
-			const void* component_data = ecsact_get_component(
-				registry_id,
-				component_info.entity_id,
-				component_info.component_id,
-				nullptr // TODO: indeded fields
-			);
-
 			execution_events->init_callback(
 				component_info.event,
 				component_info.entity_id,
 				component_info.component_id,
-				component_data,
+				get_component_cache(
+					component_info.entity_id,
+					component_info.component_id
+				),
 				execution_events->init_callback_user_data
 			);
 		}
@@ -106,18 +126,14 @@ void execution_callbacks::invoke(
 
 	if(execution_events->update_callback != nullptr) {
 		for(auto& component_info : update_callbacks) {
-			const void* component_data = ecsact_get_component(
-				registry_id,
-				component_info.entity_id,
-				component_info.component_id,
-				nullptr // TODO: indeded fields
-			);
-
 			execution_events->update_callback(
 				component_info.event,
 				component_info.entity_id,
 				component_info.component_id,
-				component_data,
+				get_component_cache(
+					component_info.entity_id,
+					component_info.component_id
+				),
 				execution_events->update_callback_user_data
 			);
 		}
@@ -125,22 +141,16 @@ void execution_callbacks::invoke(
 
 	if(execution_events->remove_callback != nullptr) {
 		for(auto& component_info : remove_callbacks) {
-			for(auto& execute_component : remove_execution_components) {
-				if(execute_component.entity_id != component_info.entity_id &&
-					 execute_component._id != component_info.component_id) {
-					continue;
-				}
-				auto deserialized_component =
-					ecsact::deserialize(execute_component._id, execute_component.data);
-
-				execution_events->remove_callback(
-					component_info.event,
+			execution_events->remove_callback(
+				component_info.event,
+				component_info.entity_id,
+				component_info.component_id,
+				get_component_cache(
 					component_info.entity_id,
-					component_info.component_id,
-					deserialized_component.data(),
-					execution_events->remove_callback_user_data
-				);
-			}
+					component_info.component_id
+				),
+				execution_events->remove_callback_user_data
+			);
 		}
 	}
 
@@ -154,9 +164,11 @@ void execution_callbacks::invoke(
 			);
 		}
 	}
+
+	comp_cache.clear();
 }
 
-bool execution_callbacks::has_callbacks() {
+auto execution_callbacks::has_callbacks() const -> bool {
 	if(init_callbacks_info.size() > 0) {
 		return true;
 	}
@@ -180,6 +192,54 @@ bool execution_callbacks::has_callbacks() {
 	return false;
 }
 
+auto execution_callbacks::add_component_cache(
+	ecsact_entity_id    entity,
+	ecsact_component_id component_id,
+	const void*         component_data
+) -> void {
+	auto serialized_comp =
+		ecsact::serialize(ecsact_component{component_id, component_data});
+	for(auto&& [itr, end] = comp_cache.equal_range(entity); itr != end; ++itr) {
+		auto& cached_comp = itr->second;
+		if(cached_comp._id == component_id) {
+			cached_comp.data = serialized_comp;
+			return;
+		}
+	}
+
+	comp_cache.emplace(
+		entity,
+		types::cpp_execution_component{
+			.entity_id = entity,
+			._id = component_id,
+			.data = serialized_comp,
+		}
+	);
+}
+
+auto execution_callbacks::get_component_cache(
+	ecsact_entity_id    entity,
+	ecsact_component_id component_id
+) -> const void* {
+	auto&& [start, end] = comp_cache.equal_range(entity);
+	auto itr = std::find_if(start, end, [&](auto& p) -> bool {
+		return p.second._id == component_id;
+	});
+
+	if(itr == end) {
+		return nullptr;
+	}
+
+	return itr->second.data.data();
+}
+
+auto execution_callbacks::merge_cache( //
+	const execution_callbacks& other
+) -> void {
+	// TODO: replace existing values with matfching comp id
+	comp_cache.insert(other.comp_cache.begin(), other.comp_cache.end());
+}
+
 void execution_callbacks::init_callback(
 	ecsact_event        event,
 	ecsact_entity_id    entity_id,
@@ -200,23 +260,13 @@ void execution_callbacks::init_callback(
 			update_cb_info.entity_id == entity_id;
 	});
 
-	if(result > 0) {
-		for(int i = 0; i < self->removed_execute_components.size(); ++i) {
-			auto& execute_component = self->removed_execute_components[i];
-			if(execute_component._id == component_id) {
-				self->removed_execute_components.erase(
-					self->removed_execute_components.begin() + i
-				);
-			}
-		}
-	}
-
 	auto info = detail::types::callback_info{};
 
 	info.event = event;
 	info.entity_id = entity_id;
 	info.component_id = component_id;
 	self->init_callbacks_info.push_back(info);
+	self->add_component_cache(entity_id, component_id, component_data);
 }
 
 void execution_callbacks::update_callback(
@@ -234,6 +284,7 @@ void execution_callbacks::update_callback(
 	info.entity_id = entity_id;
 	info.component_id = component_id;
 	self->update_callbacks_info.push_back(info);
+	self->add_component_cache(entity_id, component_id, component_data);
 }
 
 void execution_callbacks::remove_callback(
@@ -259,21 +310,8 @@ void execution_callbacks::remove_callback(
 	info.event = event;
 	info.entity_id = entity_id;
 	info.component_id = component_id;
-
-	auto component_to_serialize = ecsact_component{
-		.component_id = component_id,
-		.component_data = component_data
-	};
-
-	auto serialized_component = ecsact::serialize(component_to_serialize);
-
-	self->removed_execute_components.push_back(types::cpp_execution_component{
-		.entity_id = entity_id,
-		._id = component_id,
-		.data = serialized_component,
-	});
-
 	self->remove_callbacks_info.push_back(info);
+	self->add_component_cache(entity_id, component_id, component_data);
 }
 
 void execution_callbacks::entity_created_callback(

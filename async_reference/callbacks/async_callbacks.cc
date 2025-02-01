@@ -8,6 +8,7 @@ void async_callbacks::add(const types::async_requests type) {
 }
 
 static auto _invoke(
+	ecsact_async_session_id              session_id,
 	const ecsact_async_events_collector* async_evc,
 	types::async_error                   req
 ) -> void {
@@ -16,6 +17,7 @@ static auto _invoke(
 	}
 
 	async_evc->async_error_callback(
+		session_id,
 		req.error,
 		req.request_ids.size(),
 		req.request_ids.data(),
@@ -24,6 +26,7 @@ static auto _invoke(
 }
 
 static auto _invoke(
+	ecsact_async_session_id              session_id,
 	const ecsact_async_events_collector* async_evc,
 	ecsact_execute_systems_error         err
 ) -> void {
@@ -32,12 +35,14 @@ static auto _invoke(
 	}
 
 	async_evc->system_error_callback(
+		session_id,
 		err,
 		async_evc->system_error_callback_user_data
 	);
 }
 
 static auto _invoke(
+	ecsact_async_session_id              session_id,
 	const ecsact_async_events_collector* async_evc,
 	types::async_request_complete        req
 ) -> void {
@@ -46,13 +51,32 @@ static auto _invoke(
 	}
 
 	async_evc->async_request_done_callback(
+		session_id,
 		req.request_ids.size(),
 		req.request_ids.data(),
 		async_evc->async_request_done_callback_user_data
 	);
 }
 
-void async_callbacks::invoke(const ecsact_async_events_collector* async_evc) {
+static auto _invoke(
+	ecsact_async_session_id              session_id,
+	const ecsact_async_events_collector* async_evc,
+	ecsact_async_session_event           event
+) -> void {
+	if(async_evc->async_session_event_callback == nullptr) {
+		return;
+	}
+	async_evc->async_session_event_callback(
+		session_id,
+		event,
+		async_evc->async_session_event_callback_user_data
+	);
+}
+
+void async_callbacks::invoke(
+	ecsact_async_session_id              session_id,
+	const ecsact_async_events_collector* async_evc
+) {
 	if(requests.empty()) {
 		return;
 	}
@@ -73,14 +97,17 @@ void async_callbacks::invoke(const ecsact_async_events_collector* async_evc) {
 
 	for(auto& request : pending_requests) {
 		std::visit(
-			[async_evc](auto&& req) { _invoke(async_evc, std::move(req)); },
+			[session_id, async_evc](auto&& req) {
+				_invoke(session_id, async_evc, std::move(req));
+			},
 			request
 		);
 	}
 }
 
-void async_callbacks::add_many(const std::vector<types::async_requests>& types
-) {
+auto async_callbacks::add_many( //
+	const std::vector<types::async_requests>& types
+) -> void {
 	std::unique_lock lk(async_m);
 	requests.insert(requests.end(), types.begin(), types.end());
 }
