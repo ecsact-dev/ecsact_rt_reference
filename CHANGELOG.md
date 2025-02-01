@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.2.0 - 2025-02-01
+#### Features
+- implement new async session api (#36) - (19e3c71) - Ezekiel Warren
+
+- - -
+
 ## 0.1.2 - 2024-10-22
 #### Features
 - new async stream api (#27) - (5ca90a5) - Ezekiel Warren
